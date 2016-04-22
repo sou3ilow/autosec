@@ -1,0 +1,156 @@
+
+<style>
+
+	body {
+		margin: 1in;
+	}	
+
+	.note {
+		font-size: small;
+		padding: 1px;
+		background-color: gray;
+		color: white;
+	}
+</style>
+
+Security and Privacy Consideration on Vehicle APIs.
+
+<h1>概要 Abstract</h1>
+
+セキュリティに関する。
+
+<p><span class=note>要旨</span>
+この文書はW3C Vehilce API (Vehicle Indormation Access APIとVehicle Data Specification)を実装・運用するためのガイドラインである。
+この文書ではVehivle APIを備えたIVIを想定して、典型的な構成と運用環境を示し、適切に守られるべき資産とプライバシが配慮されるべき
+項目を示し、またAPIの利用を特定の開発者に制限するためのベストプラクティスについて述べる。
+
+<p><span class=note>Abstract</span>
+This  document provide a guideline to implemnt or utilze* W3C Vehicle APIs(Vehicle Information Access API and Vehicle Data Specification).
+This document assumes IVIs (In-vehilce Infortaiment) that have webruntime with Vehilce APIs, present* a typical acrchitecture a
+nd operatin environment, lists up assets to be protected and information to be treated with privacy consideration*, 
+and descrbes best practices to restrict the use of API only for user who have been approved*.
+
+<h1>導入 Introduction</h1>
+
+<p><span class=note>オープン性と安全性</span>
+車を始め、多様なデバイスがインターネットに接続されることにより様々なサービスが考えられるようになる
+Vehilcle APIはWebのインターフェースを規定することで、車をプラットフォームとしてより沢山の開発者がイノベーションをもたらす手助けをする。
+車は人命を預かる機械であり、その安全性の必要性は今後も全く変わらない。
+この文書はVehicle APIの実装・運用を検討する開発者に、セキュリティ・プライバシについて検討する際のガイドラインを提供する。
+
+<p><span class=note>Openness and Security</span>
+Connecting to intenet enables varios services for devices including cars.
+Vehilce APIs defines an interface to make vehicles a new open platform that is attactive for developpers produce innovations*. 
+
+
+
+
+
+<p><h1>構成 Architecture</h1>
+
+本文書ではIVIがインターネットとCANの両方にアクセス可能な場所に設置されていると想定する。
+CANとIVIとの間のデータ接続は適切な方法でフィルタされていなくてはならない。
+データブローカーのようなゲートウェイの設置が一般に検討される。
+
+<pre>
+    CAN - (x) - IVI - Internet
+</pre>
+
+IVIがVehicle APIを実装して対応するサービスを実行するとき、2つのケースが想定される。
+ひとつはブラウザアプリ上に複数のWebContentが同時実行されるもの、
+もう一つはランタイムとWebContentのセットがアプリケーションとして実行されるものである。
+
+<pre>
+	OS - BrowserApplication(Runtime) - WebContent
+	OS - NativeApplication (Runtime + WebContent)
+</pre>
+
+Vehicle APIの実装にあたってはどちらのモデルか（あるいは両方）を選択し
+<ul>
+	<li> WebContent毎のVehicle API利用パーミッション
+	<li> Vehille APIがアクセスするリソースへの競合
+</ul>
+を適切に処理する必要がある。
+
+<p>
+
+<ul>
+<li> セグメンテーション：ランタイムがVehicle APIを実行する場合に、
+そのリクエストが、複数の段階でチェックを受けるように構成する。
+アプリケーションのパーミッション、APIの実行時パーミッション、など。
+<li> マルウェア、エクスプロイト検知とアプリケーションの停止：
+異常な動作、要求を行うアプリケーションを停止する。
+ルートを取得された端末は安全とはみなせないため、動作を停止する。
+<li> メーカーによるアプリ制限***
+<li> ユーザによるアプリ制限 ****
+<li> URLフィルタリング：フィッシング、マルウェアのインストールを促す、
+スパムなどセキュリティ上問題のあるサイトはURLフィルタによりある程度
+避けることができる。
+URLのリストは公開されているものが利用可能。
+<li>証明書、トークン等、一般的なWeb技術による保護。
+<li>SIEMによる危険な徴候の検知
+</ul>
+
+
+
+
+
+
+
+
+
+	外部からの
+
+
+
+<p> *********** updateについて **************************
+
+<h1>参照 Reference</h1>
+
+Vehilcle API周辺のセキュリティ・プライバシーは、基礎となるコンポーネントのセキュリティに依拠する。
+下記の点はこの文書の対象ではないがIVI/APIの提供者は注意深く検討する必要がある。
+<ul>
+	<li>* __ISO 26262__ IVIは車システムの一部として正常に動作しなくてはならない
+	<li>* __ISO/IEC 15408__ IVIは情報システムとして、不正な利用を排除しなくてはならない。
+	<ul>
+		<li>* 車両は原則としてドライバーを第一のユーザとみなすべきである。
+		<li>* 車両の所有者、同乗者もまたユーザーとみなすことができるが、現時点でVehicle APIはそのような概念をサポートしない。
+	</ul>
+	<li>* __CVE__ WebRuntimeあるいはOSに脆弱性が見つかった場合はすみやかに修正が行えるような措置を取るべきである。
+	<li>* __CVSS V3__ 脆弱性の深刻度を定量化する手法として利用すべきである。
+</ul>
+
+<h1>資産 Assets</h1>
+
+車は多数のセンサー、多数の機能を持ち、これらは情報システムとして見た時に適切に利用されるべき資産である。
+
+Vehicle Information Access APIはデータポイントに対しset/get/subscribeを定めている。
+タスクフォースではsetメソッドを提供することについて慎重な意見がある一方で、
+HVAC系については必要であるとの意見もあり、API Spec上は特に制限を設けていない。
+実際に提供するかどうかの判断は実装者に委ねられている。
+
+一方プライバシについては、APIの利用者が一義的に配慮しなくてはならない。
+表1はVehicle APIを経由して得ることのできる（あるいは将来得られるようになる可能背性のある）データ
+をまとめたものであり、タスクフォースが特に慎重な配慮を要すると考えるものはマーク付されている。
+
+API実装者はエンドユーザの意思を反映するため、Access Control等、何らかの方法でAPIの利用を制限すべきである。
+
+<h1>API Access Control</h1>
+
+歴史的に、WebAPIの利用はオリジン単位で管理され、ユーザの意思に基づき許諾されてきた。
+API実装者はその精神にそって、ユーザに何らかの選択肢を与えるべきである。
+Vehilcle APIは詳細なインターフェースを提供するため、実装者の視点で開示が望ましくないものも含まれる。
+そのようなデータポイントについては、APIの定義にそって提供を行わないこともできる。
+更に進んで、ユーザを保護するという観点から、特定の組織や、許諾を与えたコンテンツにのみAPIの利用を
+認めたい場合が考えられる。この場合いくつかの選択肢を示す。
+
+<ol>
+	<li>(1) Modelで示したように、Vehicle APIがブラウザ上ではなく、何らかのNativeApplicationでのみ利用可能である場合、
+NativeOSのパーミッションモデル、NativeOSでのマーケットシステムを利用することにより、APIの利用を制限することができる。
+	<li>(2) Runtimeは実行中のWebContentsのオリジンを知ることができる。Vehicle APIにアクセスが試みられた際、内部に持つホワイトリスト
+と突合し、予め認められたオリジンにのみAPIの利用を許可することができる。
+	<li>(3) LocalにProxyサーバーを設けて外部との通信を経由させ、問題があると判断されたVehicle APIの呼び出しをサニタイズすることができる。
+	<li>(4) Vehilce APIをクライアントサイドで実装せず、クラウドサーバへ迂回させサーバへのアクセス時にユーザ認証・利用オリジンのチェックを
+行うことができる。
+</ol>
+
