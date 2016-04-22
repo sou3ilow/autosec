@@ -88,6 +88,7 @@ An individual who has actual knowledge of a patent which the individual believes
 	<li> <a href="#**"><span class="secno">3</span>標準的なWeb Security技術の利用</h2>
 	<li> <a href="#**"><span class="secno">4</span>プライバシーと緊急性 Privacy and Emergency </a>
 	<li> <a href="#**"><span class="secno">5</span>アクセスコントロールのベストプラクティス Best practice on Access Control</a>
+	<li> <a href="#**"><span class="secno">6</span>謝辞</a>
 	<li> <a href="#**"><span class="secno">A</span>リファレンス References</a>
 	<ol>
 		<li><a href="#norm"><span class="secno">A.1</span>引用規格 Normative References</a>
@@ -97,7 +98,7 @@ An individual who has actual knowledge of a patent which the individual believes
 </nav>
 
 <h2 id="intro">
-<span class="secno">1 </span> Introduction</h2>
+<span class="secno">1 </span> 導入 Introduction</h2>
   
 <p>
 Vehicle APIsは乗用車のIVI(In-Vehicle Infortainment)に実装されることを想定して策定されている。
@@ -127,7 +128,7 @@ IVIは情報システムとして、不正な利用を排除しなくてはな�
 </ul>
 
 <h3 id="conventions">
-<span class="secno">1.1 </span>Document conventions</h3>
+<span class="secno">1.1 </span>文書規約 Document conventions</h3>
 
 <p>Conformance requirements are expressed with a combination of
 descriptive assertions and <a href="#biblio-rfc2119">[RFC2119]</a> terminology. The key words "MUST",
@@ -279,7 +280,7 @@ OSを含めたアップデート方法を予め検討しておくべきである
 脆弱性の深刻度を定量化するには[CVSS V3]を利用してもよい。
 
 <h2 id="emergency">
-<span class="secno">2 </span>Privacy及びEmergency</h2>
+<span class="secno">2 </span>Privacyと緊急性 mergency</h2>
 
 <p>
 車両からもたらされる情報は 状況、ユーザの意思、local regularionによって扱い方を決めるべきである。
@@ -295,9 +296,7 @@ DNTが指定されたリクエストに関し、勧告の趣旨に沿った適�
 調査からは、緊急時においてさえもそのような情報提供を行いたくないとする
 ユーザが30%にのぼることが確認されている。(この節の結論をどうするか）
 
-<h2 id="reference">
-<span class="secno">2 </span>Refference</h2>
-
+<!--
 <h2 id="assets">
 <span class="secno">2 </span>保護の必要な情報資産 Assets to be protected</h2>
 
@@ -314,6 +313,11 @@ HVAC系については必要であるとの意見もあり、API Spec上は特�
 をまとめたものであり、タスクフォースが特に慎重な配慮を要すると考えるものはマーク付されている。
 
 API実装者はエンドユーザの意思を反映するため、Access Control等、何らかの方法でAPIの利用を制限すべきである。
+-->
+
+<h2 id="ac">
+<span class="secno">5 </span>アクセスコントロールのベストプラクティス</h2>
+
 
 <p>
 歴史的に、WebAPIの利用はオリジン単位で管理され、ユーザの意思に基づき許諾されてきた。
@@ -332,6 +336,9 @@ NativeOSのパーミッションモデル、NativeOSでのマーケットシス�
 	<li>(4) Vehilce APIをクライアントサイドで実装せず、クラウドサーバへ迂回させサーバへのアクセス時にユーザ認証・利用オリジンのチェックを
 行うことができる。
 </ol>
+
+<h2 id="ac">
+<span class="secno">6 </span>謝辞</h2>
 
 <h2 class="no-num heading settled" id="references">References</h2>
 <h3 class="no-num heading settled" id="normative">Normative References</h3>
