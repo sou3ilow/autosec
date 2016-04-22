@@ -50,8 +50,9 @@
 	</div>
 
 <h2 id="abstract">Abstract</h2>
-   <p>
-この文書はW3C Vehilce API (Vehicle Indormation Access APIとVehicle Data Specification)を実装・運用するにあたって留意すべきセキュリティとプライバシにについて述べたものである。
+<p>
+この文書はW3C Vehilce API (Vehicle Indormation Access APIとVehicle Data Specification)を実装・運用するにあたって
+留意すべきセキュリティとプライバシにについて述べたものである。
 
 この文書ではVehivle APIを備えたIVIを想定して、典型的な構成と運用環境を示し、適切に守られるべき資産とプライバシが配慮されるべき
 項目を示し、またAPIの利用を特定の開発者に制限するためのベストプラクティスについて述べる。
@@ -79,15 +80,18 @@ An individual who has actual knowledge of a patent which the individual believes
 
 <h2>Table of Contents</h2>
 <ol class="toc" role="directory">
-	<li><a href="#intro"><span class="secno">1</span> Introduction</a>
+	<li><a href="#intro"><span class="secno">1</span>導入 Introduction</a>
 	<ol>
-		<li><a href="#conventions"><span class="secno">1.1</span> Document Conventions</a>
+		<li><a href="#conventions"><span class="secno">1.1</span>文書規約 Document Conventions</a>
 	</ol>
-	<li>
-	<a href="#references"><span class="secno">B</span> References</a>
+	<li> <a href="#**"><span class="secno">2</span>アーキテクチャ Architecture</a>
+	<li> <a href="#**"><span class="secno">3</span>標準的なWeb Security技術の利用</h2>
+	<li> <a href="#**"><span class="secno">4</span>プライバシーと緊急性 Privacy and Emergency </a>
+	<li> <a href="#**"><span class="secno">5</span>アクセスコントロールのベストプラクティス Best practice on Access Control</a>
+	<li> <a href="#**"><span class="secno">A</span>リファレンス References</a>
 	<ol>
-		<li><a href="#normative"><span class="secno">B.1</span> Normative References</a>
-		<li><a href="#informative"><span class="secno">B.2</span> Informative References</a>
+		<li><a href="#norm"><span class="secno">A.1</span>引用規格 Normative References</a>
+		<li><a href="#info"><span class="secno">A.2</span>参考規格 Informative References</a>
 	</ol>
 </ol>
 </nav>
@@ -95,23 +99,46 @@ An individual who has actual knowledge of a patent which the individual believes
 <h2 id="intro">
 <span class="secno">1 </span> Introduction</h2>
   
-  <p>
-  車を始め、多様なデバイスがインターネットに接続されることにより様々なサービスが考えられるようになる
-Vehilcle APIはWebのインターフェースを規定することで、車をプラットフォームとしてより沢山の開発者がイノベーションをもたらす手助けをする。
-車は人命を預かる機械であり、その安全性の必要性は今後も全く変わらない。
-この文書はVehicle APIの実装・運用を検討する開発者に、セキュリティ・プライバシについて検討する際のガイドラインを提供する。
+<p>
+Vehicle APIsは乗用車のIVI(In-Vehicle Infortainment)に実装されることを想定して策定されている。
+セキュリティ・プライバシの観点からは、PC上のブラウザとは異なり下記の点に留意した検討がなされなくてはならない。
+
+<ol>
+	<li> ドライバー・同乗者が安全であること。
+	<li> 複数のドライバによって利用できること。
+</ol>
+
+<p>
+この目的のためには、ランタイムのみならずIVIのOSや構成、IVIとCANとの接続にも注意深い設計が必要である。
+そのためこの文書ではIVIの構成、IVIと他のモジュールとの関連、 緊急時におけるプライバシの取り扱いなどにも触れる。
+
+<p>
+この文書は車とWebのコネクションに関連したセキュリティ・プライバシのトピックを扱うが、
+IVIの開発者はその他の部分について、別の適切な文書を参照することを勧める。
+<ul>
+<li>[ISO 26262] は自動車の電気・電子に関する機能安全についての国際規格である。
+IVIは車システムの一部として正常に動作しなくてはならない
+<li>[ISO/IEC 15408] は通称CCと呼ばれる、コンピュータ・セキュリティのための国際規格である。
+IVIは情報システムとして、不正な利用を排除しなくてはならない。
+	<ul>
+		<li> 車両は原則としてドライバーを第一のユーザとみなすべきである。
+		<li> 車両の所有者、同乗者もまたユーザーとみなすことができるが、現時点でVehicle APIはそのような概念をサポートしない。
+	</ul>
+</ul>
 
 <h3 id="conventions">
 <span class="secno">1.1 </span>Document conventions</h3>
-  <p>Conformance requirements are expressed with a combination of
-    descriptive assertions and RFC 2119 terminology. The key words "MUST",
-    "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
-    "RECOMMENDED", "MAY", and "OPTIONAL" in the normative parts of this
-    document are to be interpreted as described in RFC 2119.
-    However, for readability, these words do not appear in all uppercase
-    letters in this specification. </p>
-  <p>All of the text of this specification is normative except sections
-    explicitly marked as non-normative, examples, and notes. <a href="#biblio-rfc2119">[RFC2119]</a></p>
+
+<p>Conformance requirements are expressed with a combination of
+descriptive assertions and <a href="#biblio-rfc2119">[RFC2119]</a> terminology. The key words "MUST",
+"MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
+"RECOMMENDED", "MAY", and "OPTIONAL" in the normative parts of this
+document are to be interpreted as described in <a href="#biblio-rfc2119">[RFC2119]</a>
+However, for readability, these words do not appear in all uppercase
+letters in this specification. </p>
+
+<p>All of the text of this specification is normative except sections
+explicitly marked as non-normative, examples, and notes. <a href="#biblio-rfc2119">[RFC2119]</a></p>
 
 <!--
   <p>Examples in this specification are introduced with the words "for example"
@@ -147,79 +174,137 @@ Vehilcle APIはWebのインターフェースを規定することで、車を�
 <span class="secno">2 </span>アーキテクチャ Architecture</h2>
 
 本文書ではIVIがインターネットとCANの両方にアクセス可能な場所に設置されていると想定する。
-CANとIVIとの間のデータ接続は適切な方法でフィルタされていなくてはならない。
-データブローカーのようなゲートウェイの設置が一般に検討される。
+CANとIVI、IVIとInternetの間は適切に分離され、何らかのフィルタが設置されるべきである。
 
 <pre>
-    CAN - (x) - IVI - Internet
+    CAN - (X) - IVI - (Y)- Internet
 </pre>
 
-IVIがVehicle APIを実装して対応するサービスを実行するとき、2つのケースが想定される。
-ひとつはブラウザアプリ上に複数のWebContentが同時実行されるもの、
-もう一つはランタイムとWebContentのセットがアプリケーションとして実行されるものである。
+<p>
+CAN-IVI間のフィルタはIVIからCANに異常なシグナルが混入することを防止し、
+CANからIVIに不要な情報を送出しないようにしなくてはならない。
+
+<p>
+IVIとInternetに設置するフィルタは、IVIを不正なアクセスから守り、
+Internet上の有害なコンテンツがIVIに持ち込まれることを防止する。
+これには様々なレイヤ・機能のものが考えられ、IVIの一部として実装することがふさわしい物もある。
+<ul>
+	<li> プライベートなアドレス空間を与えるルーターは外部からのアクセスを困難にする
+	<li> ファイヤーウォールはIVIへのアクセスを必要最小限にする。
+	<li> URLフィルタは、与えられたURLリストへのアクセスを許可または拒否することで危険なサイトの閲覧を防止する。
+	<!--
+	<li> URLフィルタリング：フィッシング、マルウェアのインストールを促す、
+	スパムなどセキュリティ上問題のあるサイトはURLフィルタによりある程度
+	避けることができる。
+	URLのリストは公開されているものが利用可能。
+	-->
+	<li> WebProxy, ウイルスチェッカーを介することで、ダウンロードされるHTML/JS/CSS、その他のコンテンツを網羅的に走査、
+	サニタイズすることができる。
+</ul>
+
+<p>フィルタを通過し、不正なコードが内部に混入した場合に備え、IVIは下記の機能を持つことを検討すべきである。
+
+<ul>
+	<li> セグメンテーション：ランタイムがVehicle APIを実行する場合に、そのリクエストが、
+	アプリケーションのパーミッション、APIの実行時パーミッション、など複数の段階でチェックを受けるように構成する。
+	<li> マルウェア、エクスプロイト検知とアプリケーションの停止： 異常な動作、要求を行うアプリケーションを停止する。
+	ルートを取得された端末は安全とはみなせないため、動作を停止する。
+	<!--
+	<li> メーカーによるアプリ制限*** => access controll
+	<li> ユーザによるアプリ制限 **** => Permission
+	-->
+</ul>
+
+
+
+<p>IVIはこれまで個々のプラットフォーム上で開発されてきており、
+Vehicle APIを取り込んだIVIはスマートフォンに見られるように、
+ネイティブアプリとWebアプリをサポートすると考えられ、
+Webアプリにもブラウザで動作するものと、Runtimeを内包した形態のものが考えられる。
 
 <pre>
 	OS - BrowserApplication(Runtime) - WebContent
 	OS - NativeApplication (Runtime + WebContent)
 </pre>
 
-Vehicle APIの実装にあたってはどちらのモデルか（あるいは両方）を選択し
+<p>
+Vehicle APIsを含むW3C規格は、双方のモデルに含まれるWebContentとRuntimeの関係を重視し、
+正しいコンテンツがRuntimeの機能を正しく利用できることを要請する。
+IVIの安全性を考える場合は、RuntimeとOSとの関係がより重視される必要がある。
+その際の観点は下記の通りである。
 <ul>
-	<li> WebContent毎のVehicle API利用パーミッション
-	<li> Vehille APIがアクセスするリソースへの競合
+	<li> Vehille APIを経由したリクエストが複数のコンテンツから送らると際、リソースへの競合は適切に処理されるべきである。
+	<li> ehicle APIの利用パーミッションはWebコンテンツごとに適切に管理されるべきである。
 </ul>
-を適切に処理する必要がある。
+
+<p>Vehicle Information Access APIが定めるget/set/subscribeのうち、setをサポートする場合、リソース競合の観点から
+慎重な設計が求められる。現在のSpecはデータポイントのロック機構をサポートしないため、
+少なくとも、「setを行うことのできるContentがIVI上でたかだか一つであること」を保証し無くてはならない。
+
+そうでない場合、一つのデータポイントに対し相反する2つの入力が与えられたり、
+2つののデータポイントを同時に操作するべき時に片方しか操作できないといった問題が生じうる。
+
+
+<h2 id="standard">
+<span class="secno">3 </span>標準的なWeb Security技術の利用</h2>
+
+<p>以下に挙げるSecurty関連勧告は開発者がセキュリティを検討する上で、
+核となる技術であり、Vehicle APIsを実装するUser-Agentはこれらも実装を必須とすべきである。
+
+<ul>
+	<li>[HTTPS] は接続先が詐称されることを防ぎ通信を暗号化する、WebSecurityの基本となる勧告である
+	<li>[CSP 2] は開発者が意図しないリソースの利用を防ぐことでXSSなどの攻撃を効果的に防ぐ勧告である。
+	<li>[CORS] はクロスオリジンアクセスを特定のサーバにのみ許諾することで、不特定多数からの攻撃を避けるための勧告である。
+	<li>[DNT] はユーザが個人の追跡を拒否することを表明するための勧告である。
+	<!--
+	<li>[P3P] 
+	<li>[MIX] 
+	-->
+</ul>
 
 <p>
+開発者は上記を有効に利用するとともに、一般的なWebセキュリティ技術も取り入れることで、
+悪意のあるコードがIVIにもたらされないよう留意する。
+そのような技術には下記のものがある。
 
 <ul>
-<li> セグメンテーション：ランタイムがVehicle APIを実行する場合に、
-そのリクエストが、複数の段階でチェックを受けるように構成する。
-アプリケーションのパーミッション、APIの実行時パーミッション、など。
-<li> マルウェア、エクスプロイト検知とアプリケーションの停止：
-異常な動作、要求を行うアプリケーションを停止する。
-ルートを取得された端末は安全とはみなせないため、動作を停止する。
-<li> メーカーによるアプリ制限***
-<li> ユーザによるアプリ制限 ****
-<li> URLフィルタリング：フィッシング、マルウェアのインストールを促す、
-スパムなどセキュリティ上問題のあるサイトはURLフィルタによりある程度
-避けることができる。
-URLのリストは公開されているものが利用可能。
-<li>証明書、トークン等、一般的なWeb技術による保護。
-<li>SIEMによる危険な徴候の検知
+	<li>パスワード等による認証
+	<li>トークン等に対する適切な有効期間の設定
+	<li>サーバに対する異常なアクセスの検知(SIEM)
 </ul>
 
+<p>WebのSecuiryを有効に保つには、セキュリティホールが見つかった際に速やかなアップデートを行うことが必要である。
+[CVE] は幅広くWebRuntimeあるいはOSに脆弱性を報告しており、IVIの開発者はそれらの情報をもとに、
+OSを含めたアップデート方法を予め検討しておくべきである。
+脆弱性の深刻度を定量化するには[CVSS V3]を利用してもよい。
 
+<h2 id="emergency">
+<span class="secno">2 </span>Privacy及びEmergency</h2>
 
-	外部からの
+<p>
+車両からもたらされる情報は 状況、ユーザの意思、local regularionによって扱い方を決めるべきである。
+Vehicle APIsの提供するデータはすべてユーザに属するものであり、原則としてすべて保護されるべきプライベートな情報である。
+Vehilce APIs実装者はDNTを実装するとともに、API使用に際して適切なパーミッション機構を設けるべきである。
 
+<p>
+またAPIの利用者は、車両の情報を利用するにあたってはわかりやすい許諾をユーザーに得るべきであり、
+DNTが指定されたリクエストに関し、勧告の趣旨に沿った適切な配慮を行うべきである。
 
-
-<p> *********** updateについて **************************
+<p>
+緊急時において、そのような許諾は緩和されるべきである、との意見もあるが、
+調査からは、緊急時においてさえもそのような情報提供を行いたくないとする
+ユーザが30%にのぼることが確認されている。(この節の結論をどうするか）
 
 <h2 id="reference">
 <span class="secno">2 </span>Refference</h2>
 
-Vehilcle API周辺のセキュリティ・プライバシーは、基礎となるコンポーネントのセキュリティに依拠する。
-下記の点はこの文書の対象ではないがIVI/APIの提供者は注意深く検討する必要がある。
-<ul>
-	<li>* __ISO 26262__ IVIは車システムの一部として正常に動作しなくてはならない
-	<li>* __ISO/IEC 15408__ IVIは情報システムとして、不正な利用を排除しなくてはならない。
-	<ul>
-		<li>* 車両は原則としてドライバーを第一のユーザとみなすべきである。
-		<li>* 車両の所有者、同乗者もまたユーザーとみなすことができるが、現時点でVehicle APIはそのような概念をサポートしない。
-	</ul>
-	<li>* __CVE__ WebRuntimeあるいはOSに脆弱性が見つかった場合はすみやかに修正が行えるような措置を取るべきである。
-	<li>* __CVSS V3__ 脆弱性の深刻度を定量化する手法として利用すべきである。
-</ul>
-
-
 <h2 id="assets">
-<span class="secno">2 </span>資産 Assets</h2>
+<span class="secno">2 </span>保護の必要な情報資産 Assets to be protected</h2>
 
+<p>
 車は多数のセンサー、多数の機能を持ち、これらは情報システムとして見た時に適切に利用されるべき資産である。
 
-Vehicle Information Access APIはデータポイントに対しset/get/subscribeを定めている。
+Vehicle Information Access APIはデータポイントに対しget/set/subscribeを定めている。
 タスクフォースではsetメソッドを提供することについて慎重な意見がある一方で、
 HVAC系については必要であるとの意見もあり、API Spec上は特に制限を設けていない。
 実際に提供するかどうかの判断は実装者に委ねられている。
@@ -230,9 +315,7 @@ HVAC系については必要であるとの意見もあり、API Spec上は特�
 
 API実装者はエンドユーザの意思を反映するため、Access Control等、何らかの方法でAPIの利用を制限すべきである。
 
-<h2 id="access">
-<span class="secno">2 </span>資産 Access Contro:</h2>
-
+<p>
 歴史的に、WebAPIの利用はオリジン単位で管理され、ユーザの意思に基づき許諾されてきた。
 API実装者はその精神にそって、ユーザに何らかの選択肢を与えるべきである。
 Vehilcle APIは詳細なインターフェースを提供するため、実装者の視点で開示が望ましくないものも含まれる。
@@ -253,11 +336,15 @@ NativeOSのパーミッションモデル、NativeOSでのマーケットシス�
 <h2 class="no-num heading settled" id="references">References</h2>
 <h3 class="no-num heading settled" id="normative">Normative References</h3>
 <dl>
-	<dt id="DNT">[DNT]
-	<dd> 緊急時
+	<dt id="https">[HTTPS]
+	<dd> HTTP Over TLS, https://tools.ietf.org/html/rfc2818
 	<dt id="csp">[CSP2]
-	<dd> アプリケーション作成のtipsとして
-	<dt id="Mixed Content">[M]
+	<dd> アプリケーション作成のtipsとして https://www.w3.org/TR/CSP/
+	<dt id="cors">[CORS] 
+	<dd> https://www.w3.org/TR/cors/
+	<dt id="DNT">[DNT]
+	<dd> 緊急時 https://www.w3.org/TR/tracking-dnt/
+	<dt id="Mixed Content">[MIX] https://w3c.github.io/webappsec-mixed-content/
 	<dd> local serviceとのマッシュアップする場合に言及
 	<dt> [RFC2119]
 	<dd>S. Bradner. Key words for use in RFCs to Indicate Requirement Levels. March 1997. Best Current Practice. URL: https://tools.ietf.org/html/rfc2119
