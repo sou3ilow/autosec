@@ -3,7 +3,8 @@
   <meta charset="utf-8">
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Security and Privacy consideration on Vehicle APIs</title>
+  <!--<title>Security and Privacy consideration on Vehicle APIs</title>-->
+  <title>Vehicle APIのセキュリティーとプライバシー</title>
   <link rel="stylesheet" href="w3c-unofficial.css">
   <style>
   .example::before {
@@ -23,7 +24,8 @@
 	<div class="head">
 		<p><a class="logo" href="http://www.w3.org/">
 			<img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
-		<h1 id="title">Vehicle APIのセキュリティのプライバシ W3C Specification</h1>
+		<!-- <h1 id="title"> Security and Privacy consideration on Vehicle APIs</h1> -->
+		<h1 id="title">Vehicle APIのセキュリティーとプライバシー</h1>
 		<h2 id="subtitle">Unofficial Draft, <time class="dt-updated" datetime="2016-04-22">22 April 2016</time></h2>
 		<div>
 			<dl>
@@ -51,11 +53,12 @@
 
 <h2 id="abstract">Abstract</h2>
 <p>
-この文書はW3C Vehilce API (Vehicle Indormation Access APIとVehicle Data Specification)を実装・運用するにあたって
-留意すべきセキュリティとプライバシにについて述べたものである。
+この文書はW3C Vehicle APIs (Vehicle Information Access API 及び Vehicle Data Specification)
+を実装・運用するにあたって留意すべきセキュリティーとプライバシーについて述べたものである。
 
-この文書ではVehivle APIを備えたIVIを想定して、典型的な構成と運用環境を示し、適切に守られるべき資産とプライバシが配慮されるべき
-項目を示し、またAPIの利用を特定の開発者に制限するためのベストプラクティスについて述べる。
+この文書ではVehivle APIを備えたIVI (In-Vehicle Infotainment)
+を想定して、典型的な構成と運用環境を示し、適切に守られるべき資産とプライバシが配慮されるべき項目を示し、
+またAPIの利用を特定のコンテンツ提供者に制限するためのベストプラクティスについて述べる。
 
 <h2 id="status">Status of this document</h2>
 <p>
@@ -86,13 +89,16 @@ An individual who has actual knowledge of a patent which the individual believes
 	</ol>
 	<li> <a href="#**"><span class="secno">2</span>アーキテクチャ Architecture</a>
 	<li> <a href="#**"><span class="secno">3</span>標準的なWeb Security技術の利用</h2>
-	<li> <a href="#**"><span class="secno">4</span>プライバシーと緊急性 Privacy and Emergency </a>
-	<li> <a href="#**"><span class="secno">5</span>アクセスコントロールのベストプラクティス Best practice on Access Control</a>
-	<li> <a href="#**"><span class="secno">6</span>謝辞</a>
-	<li> <a href="#**"><span class="secno">A</span>リファレンス References</a>
+	<li> <a href="#**"><span class="secno">4</span>プライバシーの保護 Privacy Protection </a>
 	<ol>
-		<li><a href="#norm"><span class="secno">A.1</span>引用規格 Normative References</a>
-		<li><a href="#info"><span class="secno">A.2</span>参考規格 Informative References</a>
+		<li><a href="#norm"><span class="secno">4.1</span>緊急時の例外 Exception on Emergency</a>
+	</ol>
+	<li> <a href="#**"><span class="secno">5</span>アクセスコントロールのベストプラクティス Best practice on Access Control</a>
+	<li> <a href="#**"><span class="secno">A</span>謝辞 Acknowledgement</a>
+	<li> <a href="#**"><span class="secno">B</span>リファレンス References</a>
+	<ol>
+		<li><a href="#norm"><span class="secno">B.1</span>引用規格 Normative References</a>
+		<li><a href="#info"><span class="secno">B.2</span>参考規格 Informative References</a>
 	</ol>
 </ol>
 </nav>
@@ -101,29 +107,33 @@ An individual who has actual knowledge of a patent which the individual believes
 <span class="secno">1 </span> 導入 Introduction</h2>
   
 <p>
-Vehicle APIsは乗用車のIVI(In-Vehicle Infortainment)に実装されることを想定して策定されている。
-セキュリティ・プライバシの観点からは、PC上のブラウザとは異なり下記の点に留意した検討がなされなくてはならない。
+Vehicle APIsは乗用車のIVI (In-Vehicle Infortainment)に実装されることを想定して策定されている。
+その実装にあたってはPC上のブラウザとは異なり下記の点に留意されなくてはならない。
 
 <ol>
 	<li> ドライバー・同乗者が安全であること。
-	<li> 複数のドライバによって利用できること。
+	<li> ドライバー・同乗者のプライバシが保護されること。
+	<li> 複数のドライバから利用がによって利用できること。
 </ol>
 
 <p>
-この目的のためには、ランタイムのみならずIVIのOSや構成、IVIとCANとの接続にも注意深い設計が必要である。
+上記の目的のためには、ランタイムのみならずIVIが利用するOSやIVI内のアーキテクチャ、
+IVIとCAN（Car Area Network*）との接続のなされ方も注意深く設計される必要がある。
 そのためこの文書ではIVIの構成、IVIと他のモジュールとの関連、 緊急時におけるプライバシの取り扱いなどにも触れる。
 
 <p>
-この文書は車とWebのコネクションに関連したセキュリティ・プライバシのトピックを扱うが、
-IVIの開発者はその他の部分について、別の適切な文書を参照することを勧める。
+この文書はVehicle APIsに周辺のセキュリティー・プライバシーのトピックを扱うが、
+その他の部分について、IVIの開発者は別の適切な文書を参照することを勧める。
 <ul>
-<li>[ISO 26262] は自動車の電気・電子に関する機能安全についての国際規格である。
-IVIは車システムの一部として正常に動作しなくてはならない
-<li>[ISO/IEC 15408] は通称CCと呼ばれる、コンピュータ・セキュリティのための国際規格である。
-IVIは情報システムとして、不正な利用を排除しなくてはならない。
+	<li>[ISO 26262]
+   	は自動車の電気・電子に関する機能安全についての国際規格である。
+	IVIは車システムの一部として正常に動作しなくてはならない
+	<li>[ISO/IEC 15408]
+   	は通称CCと呼ばれる、コンピュータ・セキュリティのための国際規格である。
+	IVIは情報システムとして、不正な利用を排除しなくてはならない。
 	<ul>
-		<li> 車両は原則としてドライバーを第一のユーザとみなすべきである。
-		<li> 車両の所有者、同乗者もまたユーザーとみなすことができるが、現時点でVehicle APIはそのような概念をサポートしない。
+		<li> 乗用車においてはドライバーを同規格における第一のユーザとみなすべきである。
+		<li> 所有者、同乗者もまたユーザーとみなすことができるが、現時点でVehicle APIはそのような概念をサポートしない。
 	</ul>
 </ul>
 
@@ -182,11 +192,11 @@ CANとIVI、IVIとInternetの間は適切に分離され、何らかのフィル
 </pre>
 
 <p>
-CAN-IVI間のフィルタはIVIからCANに異常なシグナルが混入することを防止し、
+(X) CAN-IVI間のフィルタはIVIからCANに異常なシグナルが混入することを防止し、
 CANからIVIに不要な情報を送出しないようにしなくてはならない。
 
 <p>
-IVIとInternetに設置するフィルタは、IVIを不正なアクセスから守り、
+(Y) IVIとInternetに設置するフィルタは、IVIを不正なアクセスから守り、
 Internet上の有害なコンテンツがIVIに持ち込まれることを防止する。
 これには様々なレイヤ・機能のものが考えられ、IVIの一部として実装することがふさわしい物もある。
 <ul>
@@ -253,13 +263,13 @@ IVIの安全性を考える場合は、RuntimeとOSとの関係がより重視�
 核となる技術であり、Vehicle APIsを実装するUser-Agentはこれらも実装を必須とすべきである。
 
 <ul>
-	<li>[HTTPS] は接続先が詐称されることを防ぎ通信を暗号化する、WebSecurityの基本となる勧告である
-	<li>[CSP 2] は開発者が意図しないリソースの利用を防ぐことでXSSなどの攻撃を効果的に防ぐ勧告である。
-	<li>[CORS] はクロスオリジンアクセスを特定のサーバにのみ許諾することで、不特定多数からの攻撃を避けるための勧告である。
-	<li>[DNT] はユーザが個人の追跡を拒否することを表明するための勧告である。
+	<li> <a href="#biblio-https">[HTTPS]</a> は接続先が詐称されることを防ぎ通信を暗号化する、WebSecurityの基本となる勧告である
+	<li> <a href="#biblio-csp">[CSP2]</a> は開発者が意図しないリソースの利用を防ぐことでXSSなどの攻撃を効果的に防ぐ勧告である。
+	<li> <a href="#biblio-cors">[CORS]</a> はクロスオリジンアクセスを特定のサーバにのみ許諾することで、不特定多数からの攻撃を避けるための勧告である。
+	<li> <a href="#biblio-dnt">[DNT]</a> はユーザが個人の追跡を拒否することを表明するための勧告である。                                            
 	<!--
-	<li>[P3P] 
-	<li>[MIX] 
+	<a href="#biblio-mixed">[MIX]</a>
+	<a href="#biblio-rfc2119">[RFC2119]</a>
 	-->
 </ul>
 
@@ -280,21 +290,65 @@ OSを含めたアップデート方法を予め検討しておくべきである
 脆弱性の深刻度を定量化するには[CVSS V3]を利用してもよい。
 
 <h2 id="emergency">
-<span class="secno">2 </span>Privacyと緊急性 mergency</h2>
+<span class="secno">4 </span>プライバシーの保護 Privacy Protection</h2>
 
 <p>
-車両からもたらされる情報は 状況、ユーザの意思、local regularionによって扱い方を決めるべきである。
+Vehicle APIsから取得できる情報は、個人との関連付けが容易であることからプライバシー保護の対象である。
+<!-- C-ITS でも --> 
+***プライバシーの保護はコンテンツ制作者が一義的*に責任を負うべきであるが、
+UAがユーザーの意向(preference)を反映して外部へ送出するデータを制御する仕組みを持つことが望ましい。
+そのような仕組みは下記の機能を持つだろう。
+
+<!-- プライバシー保護の実効性をどう担保しているか、[P3P]を参考にすべきか。 -->
+<!--
+
+?? implementerとcontent prooviderの責任分界点をどうするか。
+
+implementerは（やろうと思えば）Vehicle APIs経由のデータ提供を制限することができる。
+(DOM APIとして実装されていること。LocalWeb APIではUAが管理できない）
+-->
+
+<ul>
+	<li>送出先サーバの指定
+	<li>個々のVehicle dataや位置情報についての粒度指定を含む送出制御
+	<li>送出データの閲覧、削除** <!-- 送出済みのデータを閲覧、削除するということであればサーバーの責任になる。-->
+	<li>送出先におけるデータ管理方法の確認 ** <!-- これもサーバ責任か -->
+</ul>
+
+<p>これらは運転者毎に設定可能でなくてはならないない点に注意する。</p>
+<!--
+
+サーバー毎に設定可能であるならば、 個々のサーバが同様の機能を提供するか全体を統括するモジュールが必要
+後者が現実的。
+
+
+設定情報がクラウド上にあるとすると、
+
+*** これら、或いはこれらの一部をＷｅｂによって実施する場合には
+運転者ごとに設定変更することを可能とし、また、これらの設定
+や各種情報が他人に知られたり、変更されないような仕組みも
+必要である。
+-->
+
+<!--
 Vehicle APIsの提供するデータはすべてユーザに属するものであり、原則としてすべて保護されるべきプライベートな情報である。
 Vehilce APIs実装者はDNTを実装するとともに、API使用に際して適切なパーミッション機構を設けるべきである。
 
-<p>
 またAPIの利用者は、車両の情報を利用するにあたってはわかりやすい許諾をユーザーに得るべきであり、
 DNTが指定されたリクエストに関し、勧告の趣旨に沿った適切な配慮を行うべきである。
+-->
+
+<h2 id="standard">
+<span class="secno">4.1</span>緊急時の例外 Exception on Emergency</h2>
 
 <p>
-緊急時において、そのような許諾は緩和されるべきである、との意見もあるが、
-調査からは、緊急時においてさえもそのような情報提供を行いたくないとする
-ユーザが30%にのぼることが確認されている。(この節の結論をどうするか）
+[DNT]は広くじっそうが行われているものではあるが、
+運転者の意向によりＤＮＴが設定されていても、生命・身体
+・財産を保護する必要がある緊急時・有事においては、自動車と
+いう特殊性から、例外として解除できる機能を具備すべきである。
+ただし、この例外措置は、ＤＮＴ解除を必要とする緊急時・有事
+の定義、個人、ローカルレギュレーション、情報提供先
+（recipient）によっても異なる。
 
 <!--
 <h2 id="assets">
@@ -338,22 +392,36 @@ NativeOSのパーミッションモデル、NativeOSでのマーケットシス�
 </ol>
 
 <h2 id="ac">
-<span class="secno">6 </span>謝辞</h2>
+<span class="secno">A</span>謝辞 Acknowledgement</h2>
 
-<h2 class="no-num heading settled" id="references">References</h2>
-<h3 class="no-num heading settled" id="normative">Normative References</h3>
+<h2><span class="secno">B</span>リファレンス References</h2>
+<h3><span class="secno">B.1</span>引用規格 Normative References</h3>
+
 <dl>
-	<dt id="https">[HTTPS]
+	<!--
+	<a href="#biblio-https">[HTTPS]</a>
+	<a href="#biblio-csp">[CSP2]</a>
+	<a href="#biblio-cors">[CORS]</a>
+	<a href="#biblio-dnt">[DNT]</a>
+	<a href="#biblio-mixed">[MIX]</a>
+	<a href="#biblio-rfc2119">[RFC2119]</a>
+	-->
+	<dt id="biblio-https">[HTTPS]
 	<dd> HTTP Over TLS, https://tools.ietf.org/html/rfc2818
-	<dt id="csp">[CSP2]
+
+	<dt id="#biblio-csp">[CSP2]
 	<dd> アプリケーション作成のtipsとして https://www.w3.org/TR/CSP/
-	<dt id="cors">[CORS] 
+
+	<dt id="#biblio-cors">[CORS] 
 	<dd> https://www.w3.org/TR/cors/
-	<dt id="DNT">[DNT]
+
+	<dt id="#biblit-dnt">[DNT]
 	<dd> 緊急時 https://www.w3.org/TR/tracking-dnt/
-	<dt id="Mixed Content">[MIX] https://w3c.github.io/webappsec-mixed-content/
-	<dd> local serviceとのマッシュアップする場合に言及
-	<dt> [RFC2119]
+
+	<dt id="#biblio-mixed">[MIX]
+	<dd> local serviceとのマッシュアップする場合に言及 https://w3c.github.io/webappsec-mixed-content/
+
+	<dt id="#biblio-rfc2119">[RFC2119]
 	<dd>S. Bradner. Key words for use in RFCs to Indicate Requirement Levels. March 1997. Best Current Practice. URL: https://tools.ietf.org/html/rfc2119
 
 </dl>
@@ -363,7 +431,7 @@ NativeOSのパーミッションモデル、NativeOSでのマーケットシス�
    <dd>Bert Bos; et al. <a href="http://www.w3.org/TR/CSS2">Cascading Style Sheets Level 2 Revision 1 (CSS 2.1) Specification</a>. 7 June 2011. REC. URL: <a href="http://www.w3.org/TR/CSS2">http://www.w3.org/TR/CSS2</a>
   </dl>
  -->
-<h3 class="no-num heading settled" id="informative">Informative References</h3>
+<h3><span class="secno">B.2</span>参考規格 Informative References</h3>
 <dl>
 	<dt id="iso26262">[ISO 26262]
 	<dd>...
