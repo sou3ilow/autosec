@@ -42,14 +42,19 @@
 			  display('.e', mode%2 != 2);
 		  }
 	  }
-	  var toggle; // for console
 	  addEventListener('DOMContentLoaded', function(){
+		  var toggle;
 		  switch ( location.hash ) {
 			  case '#j': toggle = createToggle(2); break;
 			  case '#e': toggle = createToggle(1); break;
 			  default: toggle = createToggle(0); break;
 		  };
 		  toggle();
+		  document.body.addEventListener('keydown', function(e) {
+			  if ( e.keyCode == 84 ) { // t
+					toggle();
+			  }
+		  });
 	  });
 
   </script>
@@ -60,7 +65,10 @@
 		<p><a class="logo" href="http://www.w3.org/">
 			<img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
 		<!-- <h1 id="title"> Security and Privacy consideration on Vehicle APIs</h1> -->
-		<h1 id="title">Vehicle APIのセキュリティーとプライバシー</h1>
+		<h1 id="title">
+			<span class=j>Vehicle APIsのセキュリティーとプライバシー</span>
+			<span class=e>Security and Privacy Consideration on Vehicle APIs</span>
+			</h1>
 		<h2 id="subtitle">Unofficial Draft, <time class="dt-updated" datetime="2016-04-22">22 April 2016</time></h2>
 		<div>
 			<dl>
@@ -133,90 +141,137 @@ W3C maintains a <a href="http://www.w3.org/2004/01/pp-impl/32061/status" rel="di
 that page also includes instructions for disclosing a patent.
 An individual who has actual knowledge of a patent which the individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the W3C Patent Policy</a>. </p>
 
+<!--
 <p> This document is governed by the <a href="http://www.w3.org/2015/Process-20150901/" id="w3c_process_revision">1 September 2015 W3C Process Document</a>. </p>
+-->
 
 <nav id="toc">
 
 <h2>Table of Contents</h2>
 <ol class="toc" role="directory">
 	<li><a href="#intro"><span class="secno">1</span>
-		<span>導入</span>
-		<span>Introduction</span>
+		<span class=j>導入</span>
+		<span class=e>Introduction</span>
 	</a>
 	<ol>
 		<li><a href="#conventions"><span class="secno">1.1</span>
-			文書規約
-			Document Conventions
+			<span class=j> 文書規約</span>
+			<span class=e> Document Conventions</span>
 		</a>
 	</ol>
 	<li> <a href="#**"><span class="secno">2</span>
-		アーキテクチャ
-		Architecture
+		<span class=j> アーキテクチャ</span>
+		<span class=e> Architecture</span>
 	</a>
 	<li> <a href="#**"><span class="secno">3</span>
-		標準的なWeb Security技術の利用
-	</h2>
-	<li> <a href="#**"><span class="secno">4</span>
-		プライバシーの保護
-	   	Privacy Protection
-   	</a>
-	<ol>
-		<li><a href="#norm"><span class="secno">4.1</span>
-			DNTとその例外
-			DNT and its Exception
+		<span class=j> 標準的なWeb Security技術の利用</span>
+		<span class=e> Standart Web Security techniqus</span>
+		</h2>
+		<li> <a href="#**"><span class="secno">4</span>
+			<span class=j> プライバシーの保護</span>
+			<span class=e> Privacy Protection</span>
 		</a>
+		<ol>
+			<li><a href="#norm"><span class="secno">4.1</span>
+				<span class=j> DNTとその例外</span>
+				<span class=e> DNT and its Exception</span>
+			</a>
+		</ol>
+		<li> <a href="#**"><span class="secno">5</span>
+			<span class=j> アクセスコントロールのベストプラクティス</span>
+			<span class=e>Best practice on Access Control</span>
+		</a>
+		<li> <a href="#**"><span class="secno">A</span>
+			<span class=j>謝辞</span>
+			<span class=e>Acknowledgement</span>
+		</a>
+		<li> <a href="#**"><span class="secno">B</span>
+			<span class=j>リファレンス</a>
+			<span class=e>References</span>
+		</a>
+		<ol>
+			<li><a href="#norm"><span class="secno">B.1</span>
+				<span class=j>引用規格</span>
+				<span class=e>Normative References</span>
+			</a>
+			<li><a href="#info"><span class="secno">B.2</span>
+				<span class=j>参考規格</span>
+				<span class=e>Informative References</span>
+			</a>
+		</ol>
 	</ol>
-	<li> <a href="#**"><span class="secno">5</span>アクセスコントロールのベストプラクティス Best practice on Access Control</a>
-	<li> <a href="#**"><span class="secno">A</span>謝辞 Acknowledgement</a>
-	<li> <a href="#**"><span class="secno">B</span>リファレンス References</a>
-	<ol>
-		<li><a href="#norm"><span class="secno">B.1</span>引用規格 Normative References</a>
-		<li><a href="#info"><span class="secno">B.2</span>参考規格 Informative References</a>
-	</ol>
-</ol>
-</nav>
+	</nav>
 
 <h2 id="intro">
 <span class="secno">1 </span> 導入 Introduction</h2>
   
 <p class=j>
-Vehicle APIsは乗用車のIVI (In-Vehicle Infortainment)に実装されることを想定して策定されている。
+Vehicle APIsは乗用車のIVI (In-Vehicle Infortainment System)に実装されることを想定して策定されている。
 その実装にあたってはPC上のブラウザとは異なり下記の点に留意されなくてはならない。
 
 <p class=e>
-Vehicle APIs is
+Vehicle APIs are assumed to be implemented on an IVI (In-Vehicle Infotainment System) for passenger automobiles.
+Compared to browsers on PCs, particular attention should be given to following points.
 
-<ol>
+<ol class=j>
 	<li> ドライバー・同乗者が安全であること。
 	<li> ドライバー・同乗者のプライバシが保護されること。
-	<li> 複数のドライバから利用がによって利用できること。
+	<li> 複数のドライバから利用できること。
+</ol>
+
+<ol class=e>
+	<li> Driver and passengers' safety
+	<li> Driver and passengers' privacy protection
+	<li> Availability for multiple drivers.*
 </ol>
 
 <p class=j>
-上記の目的のためには、ランタイムのみならずIVIが利用するOSやIVI内のアーキテクチャ、
-IVIとCAN（Car Area Network*）との接続のなされ方も注意深く設計される必要がある。
-そのためこの文書ではIVIの構成、IVIと他のモジュールとの関連、 緊急時におけるプライバシの取り扱いなどにも触れる。
+上記の目的のためには、ランタイムのみならずIVIの周辺環境も注意深く設計される必要がある。
+そのためこの文書ではIVIのアーキテクチャ、IVIとCAN（Car Area Network）との接続のなされ方についても述べ、
+サーバサイドのセキュリティや、緊急時におけるプライバシの取り扱いなどにも触れる。
+
+<p class=e>
+To safety above purposes, in addition to web-runtime, its environment should also be designed carefully. 
+Therefor this document describes architecture of IVI and connection among IVI and CAN (Car Area Network),
+and refers to server-side security and privacy on emergent situation.
+
 
 <p class=j>
 この文書はVehicle APIsに周辺のセキュリティー・プライバシーのトピックを扱うが、
 その他の部分について、IVIの開発者は別の適切な文書を参照することを勧める。
+
+<p class=e>
+This document is on security and privacy topic around Vehicle APIs. As for other topics, IVI developers
+are encouraged to refer appropriate specifications:
+
 <ul>
-	<li>[ISO 26262]
+	<li class=j>[ISO 26262]
    	は自動車の電気・電子に関する機能安全についての国際規格である。
 	IVIは車システムの一部として正常に動作しなくてはならない
-	<li>[ISO/IEC 15408]
+	<li class=e>[ISO 26262] 
+	is an international standard for functional safety of electronic system in automobiles.
+   	As a part of an automobile IVI must function well
+	<li class=j>[ISO/IEC 15408]
    	は通称CCと呼ばれる、コンピュータ・セキュリティのための国際規格である。
 	IVIは情報システムとして、不正な利用を排除しなくてはならない。
-	<ul>
+	<li class=e>[ISO/IEC 15408],
+	known as Common Criteria, is an international standard for computer security.
+   	As an information processor IVI must reject illegal access.
+	<ul class=j>
 		<li> 乗用車においてはドライバーを同規格における第一のユーザとみなすべきである。
 		<li> 所有者、同乗者もまたユーザーとみなすことができるが、現時点でVehicle APIはそのような概念をサポートしない。
+	</ul>
+	<ul class=e>
+		<li> Driver of a passenger car should be treated as the primary user of a system in this specification.
+		<li> Although owner and passengers can be considered as user at the same time, 
+		current Vehicle APIs do not support such a concept.
 	</ul>
 </ul>
 
 <h3 id="conventions">
 <span class="secno">1.1 </span>文書規約 Document conventions</h3>
 
-<p class=j>Conformance requirements are expressed with a combination of
+<p class>Conformance requirements are expressed with a combination of
 descriptive assertions and <a href="#biblio-rfc2119">[RFC2119]</a> terminology. The key words "MUST",
 "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
 "RECOMMENDED", "MAY", and "OPTIONAL" in the normative parts of this
@@ -224,7 +279,7 @@ document are to be interpreted as described in <a href="#biblio-rfc2119">[RFC211
 However, for readability, these words do not appear in all uppercase
 letters in this specification. </p>
 
-<p class=j>All of the text of this specification is normative except sections
+<p class>All of the text of this specification is normative except sections
 explicitly marked as non-normative, examples, and notes. <a href="#biblio-rfc2119">[RFC2119]</a></p>
 
 <!--
@@ -258,11 +313,18 @@ explicitly marked as non-normative, examples, and notes. <a href="#biblio-rfc211
 	-->
 
 <h2 id="architecture">
-<span class="secno">2 </span>アーキテクチャ Architecture</h2>
+	<span class="secno">2 </span>
+	<span class=j>アーキテクチャ</span>
+	<span class=e>Architecture</span>
+</h2>
 
 <p class=j>
 本文書ではIVIがインターネットとCANの両方にアクセス可能な場所に設置されていると想定する。
 CANとIVI、IVIとInternetの間は適切に分離され、何らかのフィルタが設置されるべきである。
+
+<p class=e>
+We assume that IVI is located where it can have access to Internet and CAN.
+Both CAN/IVI and IVI/Intenet are appropriately separated, there should be certain filters at each intermediate*.
 
 <pre>
     CAN - (X) - IVI - (Y)- Internet
@@ -272,12 +334,23 @@ CANとIVI、IVIとInternetの間は適切に分離され、何らかのフィル
 (X) CAN-IVI間のフィルタはIVIからCANに異常なシグナルが混入することを防止し、
 CANからIVIに不要な情報を送出しないようにしなくてはならない。
 
+<p class=e>
+(X) A filter between CAN and IVI, must prevent entering abnormal signals from IVI into CAN
+and pass minimal necessary information from CAN to IVI.
+
 <p class=j>
 (Y) IVIとInternetに設置するフィルタは、IVIを不正なアクセスから守り、
 Internet上の有害なコンテンツがIVIに持ち込まれることを防止する。
 これには様々なレイヤ・機能のものが考えられ、IVIの一部として実装することがふさわしい物もある。
-<ul>
-	<li> プライベートなアドレス空間を与えるルーターは外部からのアクセスを困難にする
+
+<p class=e>
+(Y) A filter between IVI and Internet protects IVI from unauthorized accesses and 
+deters Mal ware infection.
+There are several approach among layers and functions.
+It might be appropriate to be implemented as a part of IVI rather than an external filter.
+
+<ul class=j>
+	<li> プライベートなアドレスを与えるルーターは外部からのアクセスを困難にする
 	<li> ファイヤーウォールはIVIへのアクセスを必要最小限にする。
 	<li> URLフィルタは、与えられたURLリストへのアクセスを許可または拒否することで危険なサイトの閲覧を防止する。
 	<!--
@@ -290,9 +363,19 @@ Internet上の有害なコンテンツがIVIに持ち込まれることを防止
 	サニタイズすることができる。
 </ul>
 
+<ul class=e>
+	<li> A network router that provide private IP address makes access difficult from outside.
+	<li> A firewall minimize access to IVI.
+	<li> A URL filter looks up an access in a given URL list and prevents downloading malicious contents.
+	<li> WebProxy/Anti-Virus software sanitize downloaded HTML/JS/CSS and other data cyclopaedically.
+</ul>
+
 <p class=j>フィルタを通過し、不正なコードが内部に混入した場合に備え、IVIは下記の機能を持つことを検討すべきである。
 
-<ul>
+<p class=e>In a case that malicious code come into inside of IVI by passing those filters,
+IVI should be considered to have following architecture/functionality.
+
+<ul class=j>
 	<li> セグメンテーション：ランタイムがVehicle APIを実行する場合に、そのリクエストが、
 	アプリケーションのパーミッション、APIの実行時パーミッション、など複数の段階でチェックを受けるように構成する。
 	<li> マルウェア、エクスプロイト検知とアプリケーションの停止： 異常な動作、要求を行うアプリケーションを停止する。
@@ -303,12 +386,24 @@ Internet上の有害なコンテンツがIVIに持ち込まれることを防止
 	-->
 </ul>
 
+<ul class=e>
+	<li> Segmentation: separates modules and enforce several checks before executing request from app
+	by web-runtime. For instance, installation-time permission check and run-time permission check.***
+	<li> Malware/exploit detection and termination of application: terminates application that behaves suspiciously
+	or sends abnormal requests. Rootized devices cannot seems to be secured so system should terminate itself.
+</ul>
 
 
 <p class=j>IVIはこれまで個々のプラットフォーム上で開発されてきており、
 Vehicle APIを取り込んだIVIはスマートフォンに見られるように、
 ネイティブアプリとWebアプリをサポートすると考えられ、
 Webアプリにもブラウザで動作するものと、Runtimeを内包した形態のものが考えられる。
+
+<p class=e>
+IVI has been developed on many platforms. As seen in smartphones, 
+IVI with Vehicle API would support both native application and Web Application.
+And there are two type of apps, one is working on a browser and another contains
+web-runtime inside of the app.
 
 <pre>
 	OS - BrowserApplication(Runtime) - WebContent
@@ -320,9 +415,22 @@ Vehicle APIsを含むW3C規格は、双方のモデルに含まれるWebContent�
 正しいコンテンツがRuntimeの機能を正しく利用できることを要請する。
 IVIの安全性を考える場合は、RuntimeとOSとの関係がより重視される必要がある。
 その際の観点は下記の通りである。
-<ul>
-	<li> Vehille APIを経由したリクエストが複数のコンテンツから送らると際、リソースへの競合は適切に処理されるべきである。
-	<li> ehicle APIの利用パーミッションはWebコンテンツごとに適切に管理されるべきである。
+
+<p class=e>
+W3C specs including the Vehicle APIs attach much value on the relationship between WebContent and runtime in moth models,
+and request that an authorized content should have access runtime functions.
+Considering IVI security, on the other hand, the relationship between Runtime and operating system should be more taken care.
+Here are points.
+
+<ul class=j>
+	<li> Vehille APIを経由したリクエストが複数のコンテンツから送らる際、リソースへの競合は適切に処理されるべきである。
+	<li> Vehicle APIの利用パーミッションはWebコンテンツごとに適切に管理されるべきである。
+</ul>
+
+<ul class=e>
+	<li> Even if several contents send request at the same time via Vehille API,
+	resource race should be appropriately solved.
+	<li> Each Web Content should obtain permission to use Vehicle API independently.
 </ul>
 
 <p>Vehicle Information Access APIが定めるget/set/subscribeのうち、setをサポートする場合、リソース競合の観点から
@@ -332,6 +440,13 @@ IVIの安全性を考える場合は、RuntimeとOSとの関係がより重視�
 そうでない場合、一つのデータポイントに対し相反する2つの入力が与えられたり、
 2つののデータポイントを同時に操作するべき時に片方しか操作できないといった問題が生じうる。
 
+<p class=e>Vehicle Information Access API defins get/set/subscribe. 
+It requires careful design to support the set method from the point of resource race.
+Current spec doesn't support lock mechanism of data-point. Therefor systems must ensure that
+At most only one content exists at the same time which is able to access set-method.
+
+Otherwise one data-point receives two contradict input, or a content can set a value for one data-point
+even when the contents need to change two data-point all together.
 
 <h2 id="standard">
 <span class="secno">3 </span>標準的なWeb Security技術の利用</h2>
